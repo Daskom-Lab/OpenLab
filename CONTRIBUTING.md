@@ -17,3 +17,10 @@ Follow these naming convention for consistent naming and easier maintenance :
         ex: "Platform: add login interface"
 - `Pull Request`: \<feature\>: \<things you did (only use present tense)\> \<subfeature\> (\<related_issue\>)  
               ex: "Platform: add login interface (#21)"
+
+# Term Dictionary
+
+- `Platform`: for everything related to the application platform (currently only web version)
+- `Engine`: for everything related to the internal system that will be used mainly in the platform
+- `Processor`: for everything related to data processing either for science (machine learning) or just plain analytics
+- `Interface`: for everything related to user interface including but not limited to frontend development of the platform
