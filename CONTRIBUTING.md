@@ -21,9 +21,9 @@ Follow these naming convention for consistent naming and easier maintenance :
 - `Branch`: \<feature\>.\<subfeature\>  
         ex: "platform.login_interface"
 - `Commit`: \<feature\>: \<things you did (only use present tense)\> \<subfeature\>  
-        ex: "Platform: add login interface"
+        ex: "Platform: Add login interface"
 - `Pull Request`: \<feature\>: \<things you did (only use present tense)\> \<subfeature\> (\<related_issue\>)  
-              ex: "Platform: add login interface (#21)"
+              ex: "Platform: Add login interface (#21)"
 
 # Term Dictionary
 
