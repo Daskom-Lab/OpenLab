@@ -1,0 +1,71 @@
+name: Commit Checks
+
+on: [pull_request_target]
+
+jobs:
+  lint_commits:
+    runs-on: ubuntu-20.04
+    if: always() && github.repository == 'Daskom-Lab/OpenLab'
+
+    # Mostly follow https://github.com/SerenityOS/serenity/commits/master/.github/workflows/lintcommits.yml
+    steps:
+      - name: Get PR Commits
+        id: 'get-pr-commits'
+        uses: fakhrip/get-pr-commits@9bf180f9964a67813593e5489752e62be95fbd4f
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check linebreaks
+        if: ${{ success() || failure() }}
+        uses: tim-actions/commit-message-checker-with-regex@v0.3.1
+        with:
+          commits: ${{ steps.get-pr-commits.outputs.commits }}
+          pattern: '^[^\r]*$'
+          error: 'Commit message contains CRLF line breaks (only unix-style LF linebreaks are allowed)'
+
+      - name: Check Line Length
+        uses: tim-actions/commit-message-checker-with-regex@v0.3.1
+        with:
+          commits: ${{ steps.get-pr-commits.outputs.commits }}
+          pattern: '^.{0,72}(\n.{0,72})*$'
+          error: 'Commit message lines are too long (maximum allowed is 72 characters)'
+
+      - name: Check feature
+        if: ${{ success() || failure() }}
+        uses: tim-actions/commit-message-checker-with-regex@v0.3.1
+        with:
+          commits: ${{ steps.get-pr-commits.outputs.commits }}
+          pattern: '^\S.*?\S: .+'
+          error: 'Missing feature category in commit title (if this is a fix up of a previous commit, it should be squashed)'
+
+      - name: Check feature category
+        if: ${{ success() || failure() }}
+        uses: tim-actions/commit-message-checker-with-regex@v0.3.1
+        with:
+          commits: ${{ steps.get-pr-commits.outputs.commits }}
+          pattern: '^(?:(?:(?:P(?:rocessor|latform)|Misc)|Engine)|Interface): .+'
+          error: 'Feature category does not follow the term dictionary mentioned in CONTRIBUTING.md'
+
+      - name: Check first word of title for capitalization
+        if: ${{ success() || failure() }}
+        uses: tim-actions/commit-message-checker-with-regex@v0.3.1
+        with:
+          commits: ${{ steps.get-pr-commits.outputs.commits }}
+          pattern: '^\S.*?: [A-Z0-9]'
+          error: 'First word of commit after the subsystem is not capitalized'
+
+      - name: Check title
+        if: ${{ success() || failure() }}
+        uses: tim-actions/commit-message-checker-with-regex@v0.3.1
+        with:
+          commits: ${{ steps.get-pr-commits.outputs.commits }}
+          pattern: '^.+[^.\n](\n.*)*$'
+          error: 'Commit title ends in a period'
+
+      - name: Comment on PR
+        if: ${{ failure() && !github.event.pull_request.draft }}
+        uses: fakhrip/comment-on-pr@370e24a38c1466b1961fd28560d3b6f5511c1820
+        env:
+          GITHUB_TOKEN: ${{ secrets.BUGGIEBOT }}
+        with:
+          msg: "Some commits didnt follow the contribution guidelines mentioned in [CONTRIBUTING.md](https://github.com/Daskom-Lab/OpenLab/blob/main/CONTRIBUTING.md)."
